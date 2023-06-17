@@ -1,0 +1,27 @@
+{
+    "lang": "Russian",
+    "name": "BMSESP",
+    "short_name": "BMSESP",
+    "scope": "./",
+    "description": "BMSESP remote controller dashboard",
+    "author": "p3xx",
+    "icons": [{
+        "src": "pwa-x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+    }],
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#000000",
+    "orientation": "portrait-primary",
+    "theme_color": "#000000",
+    "url": "bmsesp.local",
+    "manifestUrl": "/manifest.json",
+    "related_applications": [{
+        "platform": "play",
+        "id": "com.p3xx.bmsesp"
+
+    }],
+    "prefer_related_applications": true
+}

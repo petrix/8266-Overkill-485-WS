@@ -1,0 +1,116 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat:600);
+@import url(https://use.fontawesome.com/releases/v5.8.2/css/all.css);
+
+body {
+  background: black;
+  min-height: 500px;
+  height: 94vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.battery {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  position: relative;
+  width: 200px;
+  height: 350px;
+}
+
+.level {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: #000;
+  height: 100%;
+}
+
+.fill {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: var(--batteryLevel);
+  background: var(--batteryColor);
+  box-shadow: 0 0 8px var(--batteryColor);
+}
+
+.pole {
+  height: 20px;
+  background: #666;
+  position: relative;
+  z-index: 1;
+}
+
+.positive {
+  width: 80px;
+  height: 12px;
+  background: #999;
+  position: absolute;
+  top: -12px;
+  left: 60px;
+}
+
+.gradient {
+  background-image: 
+    linear-gradient(to right, #0000 0% 78%, #ccc3 78%, #8883 85%, #6662 88%, #0000 85% 100%),
+    linear-gradient(to right, #0000 0% 20%, #ccc3 20%, #8883 50%, #0000 45% 100%),
+    linear-gradient(to right, #4448 0% 5%, #0008 10% 93%, #4448 96% 100%);
+}
+
+.level::before {
+  content: attr(data-level);
+  position: absolute;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  top: 25%;
+  color:#FFF;
+  font-family:Montserrat;
+  font-size:42px;
+  text-shadow:1px 1px 4px #444;
+}
+
+.level.charge::after,
+.level.power::after {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 600;
+  position: absolute;
+  bottom: 25%;
+  content: "\f0e7";
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: yellow;
+  text-shadow: 0 0 25px orange;
+  font-size: 72px;
+  text-align: center;
+  -webkit-animation: blink 2s linear infinite;
+          animation: blink 2s linear infinite;
+}
+
+.level.power::after {
+  content: "\f1e6";
+  -webkit-animation: none;
+          animation: none;
+}
+
+@-webkit-keyframes blink {
+  0%, 74% { opacity: 1; }
+  75%, 99% { opacity: 0; }
+}
+
+@keyframes blink {
+  0%, 74% { opacity: 1; }
+  75%, 99% { opacity: 0; }
+}
+
+.support {
+  font-family: Montserrat, sans-serif;
+  color: #777;
+  text-align: center;
+  margin-top: 1em;
+  font-size: 22px;  
+}
