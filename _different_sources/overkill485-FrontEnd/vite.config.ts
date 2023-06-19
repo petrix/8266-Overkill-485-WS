@@ -14,7 +14,7 @@ import type { UserConfig } from "vite";
 const config: UserConfig = {
   base: "",
   root: "src/",
-  assetsInclude: ["**/*.svg"],
+  assetsInclude: ["*.svg"],
   server: {
     port: 5555,
     open: true,
@@ -101,7 +101,7 @@ const config: UserConfig = {
     rollupOptions: {},
     minify: "terser",
     commonjsOptions: {
-      include: ["src/js/*"],
+    //   include: ["js/*.*"],
       // exclude: ["ckeditor/*"],
     },
     chunkSizeWarningLimit: 5000,

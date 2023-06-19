@@ -68,13 +68,7 @@ if(window.location.pathname == "/"){
     document.querySelector("#card").innerHTML = `
     <div id="batteryArray" class="batteryArray"></div>
         <div class="ntcsStats"></div>
-        <div class="batteryStats"></div> 
-    `
-    document.querySelector("#footer").innerHTML = `
-    <p>Network name : <span id="netName">%SSID%</span></p>
-    <p>softAP IP : <span id="softIP">%LOCALIP%</span></p>
-    <p>public IP : <span id="pubIP">%PUBLICIP%</span></p>
-    `
+        <div class="batteryStats"></div> `
     let initBtr = jsLoader(jsFiles[1]).then(e=>{
 
         console.log(initBtr)

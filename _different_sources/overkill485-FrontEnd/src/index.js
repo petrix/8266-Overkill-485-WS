@@ -2,6 +2,8 @@ import "./scss/style.scss";
 // import "./js/404.scss";
 import { dbApp } from "./db-script";
 
+import { onIPMessage } from "./onIPMessage";
+import { onNetMessage } from "./onNetMessage";
 let batteryObj;
 let refreshInt;
 let rndName = "pwa-x192.png";
@@ -20,17 +22,22 @@ document.querySelector("h1").innerText =
   window.location.pathname.split("/")[1].charAt(0).toUpperCase() +
   window.location.pathname.split("/")[1].slice(1);
 
-const glyphArr = ["home.svg", "cog.svg", "wifi.svg", "update.svg", "menu.svg"];
+const glyphArr = [
+  "home.svg",
+  "cog.svg",
+  "wifi.svg",
+  "update.svg",
+  "menu.svg",
+  "terminal.svg",
+];
 glyphArr.forEach((elem, i) => {
   loadTheFile(glyphArr[i]).then((icon) => {
     let img = document.createElement("img");
     img.src = icon.b64;
-    // img.style.top = "15px";
-    if (i > 0) {
-      // img.style.right = `${20 + (60 * (i - 1))}px`;
-    } else {
-      // img.style.left = `20px`;
-    }
+    let blb = icon.blob;
+    let b64 = icon.b64;
+    blb.text().then((e) => console.log(b64.length / e.length));
+
     document.querySelector(`#glyph${i}`).appendChild(img);
   });
 });
@@ -38,11 +45,8 @@ function loadTheFile(theName) {
   return new Promise((resolve, reject) => {
     console.log(theName);
     dbApp.checkPublication(theName, "bmsesp-db").then((res) => {
-      // console.log(res);
       if (res) {
         dbApp.loadPublication(theName, "bmsesp-db").then((x) => {
-          // resolve(x)
-          // console.log("xxxxxxxxxxxxxxxxx    ",x);
           resolve(x);
         });
       } else {
@@ -55,7 +59,7 @@ function loadTheFile(theName) {
                   resolve(res);
                 });
             } else {
-              resolve();
+              //   resolve();
             }
           }
         });
@@ -63,8 +67,8 @@ function loadTheFile(theName) {
     });
 
     /*  if(!res){
-              fetch(`./${rndName}`).then(res=>console.log(res));
-          }*/
+                  fetch(`./${rndName}`).then(res=>console.log(res));
+              }*/
   });
 }
 
@@ -89,51 +93,48 @@ async function jsLoader(name) {
       // sc.setAttribute("defer", "defer");
       console.log(sc);
       document.head.appendChild(sc);
-      resolve(sc);
+      resolve(blb.text());
+      //   resolve(sc);
     });
   });
 }
 const jsFiles = [
-  "ws.js",
-  "btr2initBtrJs.js",
+  "onIPMessage.js",
+  "initBatteryArray.js",
   "btr2refrshlvlJs.js",
-  "btr2BtrMsg.js",
-  "btr2NetMsg.js",
-  "btr2IPmsg.js",
+  "onBTRMessage.js",
+  "onNetMessage.js",
 ];
-var websocket;
-var gateway = "ws://" + "bmsesp.local" + "/ws";
+var wSock = document.wSock;
+// var gateway = "ws://" + "async-x.local" + "/ws";
+// var gateway = "ws://" + "esp-async.local" + "/ws";
+// var gateway = "ws://" + window.location.hostname + "/ws";
+// var gateway1 = "ws://" + window.location.hostname + "/ws";
+var gateway2 = "ws://" + "bmsesp2.local" + "/ws";
 async function socktRuner() {
   return new Promise((resolve, reject) => {
-    websocket = new WebSocket(gateway);
-    websocket.onopen = (e) => {
+    wSock = new WebSocket(gateway2);
+    wSock.onopen = (e) => {
       console.log("WS opened");
       console.log(e);
-    //   websocket.send("batteryStatus");
-    //   websocket.send("netscan");
-    //   websocket.send("ip");
-    resolve(websocket);
+      resolve(wSock);
     };
-    websocket.onclose = (e) => {
+    wSock.onclose = (e) => {
       console.log("WS closed");
       console.log(e);
-      setTimeout(initWebSocket, 2000);
+      setTimeout(socktRuner, 2000);
     };
-    
-    
   });
-  return websocket;
 }
 
-
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////                          //////////////////////
-  ////////////////////        INDEX PAGE        //////////////////////
-  ////////////////////                          //////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////                          //////////////////////
+////////////////////        INDEX PAGE        //////////////////////
+////////////////////                          //////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 if (window.location.pathname == "/") {
   console.log(window.location.pathname);
 
@@ -142,30 +143,49 @@ if (window.location.pathname == "/") {
         <div class="ntcsStats"></div>
         <div class="batteryStats"></div> 
     `;
-  document.querySelector("#footer").innerHTML = `
-    <p>Network name : <span id="netName">%SSID%</span></p>
-    <p>softAP IP : <span id="softIP">%LOCALIP%</span></p>
-    <p>public IP : <span id="pubIP">%PUBLICIP%</span></p>
-    `;
+
   function preloadAssets() {
     return new Promise((resolve, reject) => {
       jsLoader(jsFiles[1]).then(() => {
         jsLoader(jsFiles[2]).then(() => {
           initBatteryArray(4);
-          jsLoader(jsFiles[3]).then(() => {
-            jsLoader(jsFiles[5]).then(() => resolve());
-          });
+          jsLoader(jsFiles[3]).then((e) => resolve(e));
         });
       });
     });
   }
 
-  socktRuner().then((reslt) => {
-    preloadAssets().then(()=>{
-        websocket.send("ip");
+  socktRuner().then((sockt) => {
+    preloadAssets().then(() => {
+      wSock.send("ip");
+      wSock.send("batteryStatus");
+      let chrMSFT = document.querySelector("#chrgMosfetValue");
+      let dscMSFT = document.querySelector("#dsChrgMosfetValue");
+      chrMSFT.onclick = (e) => {
+        console.log(e.target);
+        if (!e.target.checked) {
+          let conf = confirm("are you shure?");
+          if (conf) {
+            wSock.send("MSFT--chr-false");
+          }
+        } else {
+          wSock.send("MSFT--chr-true");
+        }
+      };
+      dscMSFT.onclick = (e) => {
+        console.log(e.target);
+        if (!e.target.checked) {
+          let conf = confirm("are you shure?");
+          if (conf) {
+            wSock.send("MSFT--dsc-false");
+          }
+        } else {
+          wSock.send("MSFT--dsc-true");
+        }
+      };
     });
-    console.log(reslt);
-    reslt.onmessage = (e) => {
+    console.log(sockt);
+    sockt.onmessage = (e) => {
       console.log("WS message");
       let identifier = e.data.slice(0, 3);
       switch (identifier) {
@@ -173,17 +193,17 @@ if (window.location.pathname == "/") {
           onBTRMessage(e);
           break;
         case "IP-":
-          onIPMessage(e);
+          onIPMessage.exec(e);
           break;
 
         default:
-          onIPMessage(e);
+          onIPMessage.exec(e);
           break;
       }
     };
     clearInterval(refreshInt);
     refreshInt = setInterval(() => {
-      reslt.send("batteryStatus");
+      sockt.send("batteryStatus");
     }, 1300);
   });
 
@@ -196,39 +216,31 @@ if (window.location.pathname == "/") {
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 } else if (window.location.pathname == "/netscan") {
-  function preloadAssets(params) {
-    return new Promise((resolve, reject) => {
-      jsLoader(jsFiles[4]).then(() => {
-        jsLoader(jsFiles[5]).then(resolve());
-      });
-    });
-  }
-  
-  socktRuner().then((wbsckt) => {
-  preloadAssets().then(()=>{
-          websocket.send("netscan");
-          websocket.send("ip");
-  });  
-    console.log(wbsckt);
-    wbsckt.onmessage = (e) => {
+  socktRuner().then((sockt) => {
+    wSock.send("netscan");
+    wSock.send("ip");
+    wSock.send("batteryStatus");
+
+    console.log(sockt);
+    sockt.onmessage = (e) => {
       console.log("WS message");
       console.log(e.data.slice(0, 3));
       let identifier = e.data.slice(0, 3);
       switch (identifier) {
         case "SCN":
-          onNetMessage(e);
+          onNetMessage.exec(e);
           break;
         case "IP-":
-          onIPMessage(e);
+          onIPMessage.exec(e);
           break;
         default:
-          onIPMessage(e);
+          onIPMessage.exec(e);
           break;
       }
     };
-        //   websocket.send("batteryStatus");
-        //   websocket.send("netscan");
-        //   websocket.send("ip");
+    //   websocket.send("batteryStatus");
+    //   websocket.send("netscan");
+    //   websocket.send("ip");
   });
 
   document.querySelector("#card").innerHTML = `
@@ -241,12 +253,21 @@ if (window.location.pathname == "/") {
     <div class="credentials">
     <input id="ssidInput" type='text' placeholder='network' name='n'/>
     <hr /><input id="ssidPassword" type='password' placeholder='password' name='p'/>
-    <hr /><button class="button" id="credits" disabled="disabled">Connect</button>
+    <hr /><button class="button" id="credits">Connect</button>
     </div>
     `;
   // document.querySelector("#netscan").onmousedown = websocket.send('netscan')
   document.querySelector("#netscan").addEventListener("mousedown", (e) => {
-    websocket.send("netscan");
+    wSock.send("netscan");
+    document.querySelector("#scanStations").innerHTML = "";
+    let preloader = document.createElement("span");
+    preloader.classList.add("loader-89");
+    document.querySelector("#scanStations").appendChild(preloader);
+  });
+  document.querySelector("#credits").addEventListener("mousedown", (e) => {
+    let ssid = document.querySelector("#ssidInput").value;
+    let ssidPasswd = document.querySelector("#ssidPassword").value;
+    wSock.send("PWD--" + ssid + "-passwd-" + ssidPasswd);
     document.querySelector("#scanStations").innerHTML = "";
     let preloader = document.createElement("span");
     preloader.classList.add("loader-89");
@@ -262,18 +283,11 @@ if (window.location.pathname == "/") {
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 } else if (window.location.pathname == "/update") {
-  function preloadAssets(params) {
-    return new Promise((resolve, reject) => {
-    //   jsLoader(jsFiles[4]).then(() => {
-        jsLoader(jsFiles[5]).then(resolve());
-    //   });
-    });
-  }
-  
   socktRuner().then((reslt) => {
-   preloadAssets().then(()=>{
+    // console.log(e)
     reslt.send("ip");
-   }); 
+    reslt.send("batteryStatus");
+
     console.log(reslt);
     reslt.onmessage = (e) => {
       console.log("WS message");
@@ -281,17 +295,55 @@ if (window.location.pathname == "/") {
       let identifier = e.data.slice(0, 3);
       switch (identifier) {
         case "IP-":
-          onIPMessage(e);
+          onIPMessage.exec(e);
           break;
 
         default:
+          onIPMessage.exec(e);
           break;
       }
     };
   });
 
   document.querySelector("#card").innerHTML = `
-    <form method="POST" action="http://bmsesp.local/update" enctype="multipart/form-data">
+
+    <form method="POST" action="/update" enctype="multipart/form-data">
+    <input class="button" type="file" accept=".bin" name="update">
+    <input class="button" type="submit" value="Update"></form>`;
+
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+} else if (window.location.pathname == "/terminal") {
+  socktRuner().then((reslt) => {
+    // console.log(e)
+    reslt.send("ip");
+    reslt.send("batteryStatus");
+
+    console.log(reslt);
+    reslt.onmessage = (e) => {
+      console.log("WS message");
+      console.log(e.data);
+      let identifier = e.data.slice(0, 3);
+      switch (identifier) {
+        case "IP-":
+          onIPMessage.exec(e);
+          break;
+
+        default:
+          onIPMessage.exec(e);
+          break;
+      }
+    };
+  });
+
+  document.querySelector("#card").innerHTML = `
+   <form method="POST" action="/update" enctype="multipart/form-data">
     <input class="button" type="file" accept=".bin" name="update">
     <input class="button" type="submit" value="Update"></form>`;
 
@@ -304,12 +356,32 @@ if (window.location.pathname == "/") {
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 } else if (window.location.pathname == "/settings") {
+  socktRuner().then((reslt) => {
+    // console.log(e);
+    wSock.send("ip");
+    wSock.send("batteryStatus");
+
+    console.log(reslt);
+    reslt.onmessage = (e) => {
+      console.log("WS message");
+      // console.log(e.data);
+      let identifier = e.data.slice(0, 3);
+      switch (identifier) {
+        case "IP-":
+          onIPMessage.exec(e);
+          break;
+
+        default:
+          onIPMessage.exec(e);
+          break;
+      }
+    };
+  });
+
   document.querySelector("#card").innerHTML = `
     <p><button id="readCashed" class="button">Read Cashed Elems</button></p>
     <div id="cashedElems">
-    </div>
-
-    `;
+    </div>`;
 
   const cashedElems = document.querySelector("#cashedElems");
   document.querySelector("#readCashed").addEventListener("mousedown", (e) => {
@@ -393,33 +465,6 @@ if (window.location.pathname == "/") {
       cashedElems.appendChild(row);
     }
   }
-
-  function preloadAssets(params) {
-    return new Promise((resolve, reject) => {
-      jsLoader(jsFiles[5]).then(resolve());
-    });
-  }
-  
-  socktRuner().then((reslt) => {
-   preloadAssets().then(()=>{
-    websocket.send("ip");
-   }); 
-    console.log(reslt);
-    reslt.onmessage = (e) => {
-      console.log("WS message");
-      // console.log(e.data);
-      let identifier = e.data.slice(0, 3);
-      switch (identifier) {
-        case "IP-":
-          onIPMessage(e);
-          break;
-
-        default:
-          onIPMessage(e);
-          break;
-      }
-    };
-  });
 } else {
   console.log(window.location.pathname);
   // import "./js/404.scss";

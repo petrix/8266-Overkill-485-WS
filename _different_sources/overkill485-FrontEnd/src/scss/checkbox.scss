@@ -32,7 +32,8 @@ label:after {
 }
 
 input:checked + label {
-	background: #bada55;
+	// background: #bada55;
+	background: #29ac60;
 }
 
 input:checked + label:after {

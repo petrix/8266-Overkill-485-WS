@@ -1,0 +1,125 @@
+@include mobile {
+  .topnav {
+    // background-color: rebeccapurple;
+    height: 50px;
+    & > h1 {
+      margin: 10px 0;
+    }
+    & > a {
+
+    //   & > img {
+    //     top: 10px;
+    //     width: 30px;
+    //     // display: none;
+    //   }
+    }
+      a#glyph0 {
+        & > img {
+            left: 20px;
+        }
+      }
+      a#glyph1 {
+        & > img {
+            right: 20px;
+        }
+      }
+      a#glyph2 {
+        & > img {
+            right: 70px;
+        }
+      }
+      a#glyph3 {
+        & > img {
+            right: 120px;
+        }
+      }
+      a#glyph5 {
+        & > img {
+            right: 170px;
+        }
+      }
+      a#glyph4 {
+        & > img {
+            left: 20px;
+          display: none;
+        }
+      }
+      a>img{
+        top:10px;
+        width: 30px;
+      }
+  }
+  #footer{
+    height:50px;
+    &>p{
+        font-size: 15px;
+    }
+  }
+}
+
+@include xs-mobile {
+  .topnav {
+    // background-color: rebeccapurple;
+    height: 50px;
+    & > h1 {
+      margin: 10px 0;
+    }
+    & > a {
+
+    //   & > img {
+    //     top: 10px;
+    //     width: 30px;
+    //     // display: none;
+    //   }
+    }
+      a#glyph0 {
+        & > img {
+            left: 20px;
+          top: 10px;
+          width: 30px;
+          display: none;
+        }
+      }
+      a#glyph1 {
+        & > img {
+            right: 20px;
+          top: 10px;
+          width: 30px;
+          display: none;
+        }
+      }
+      a#glyph2 {
+        & > img {
+            right: 70px;
+          top: 10px;
+          width: 30px;
+          display: none;
+        }
+      }
+      a#glyph3 {
+        & > img {
+            right: 120px;
+          top: 10px;
+          width: 30px;
+          display: none;
+        }
+      }
+      a#glyph5 {
+        & > img {
+          width: 30px;
+          display: none;
+        }
+      }
+      a#glyph4 {
+        & > img {
+            left: 20px;
+          top: 10px;
+          width: 30px;
+          display: block;
+        }
+      }
+  }
+}
+// @include sm-screen{
+
+// }

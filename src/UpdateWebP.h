@@ -53,7 +53,7 @@ const char webUpdate_html[] PROGMEM = R"rawliteral(
   <head>
   <title>webUpdate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
- <link rel="stylesheet" href="style.css" />
+ <link rel="stylesheet" href="someshit/index-css.css" />
   <link rel="icon" href="data:,">
   </head>
   <body>
@@ -107,7 +107,7 @@ const char webUpdate_html[] PROGMEM = R"rawliteral(
   <head>
   <title>webUpdate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
- <link rel="stylesheet" href="style.css" />
+ <link rel="stylesheet" href="someshit/index-css.css" />
   <link rel="icon" href="data:,">
   </head>
   <body>
