@@ -4,6 +4,7 @@ import { dbApp } from "./db-script";
 
 import { onIPMessage } from "./onIPMessage";
 import { onNetMessage } from "./onNetMessage";
+import { onTermMessage } from "./onTermMessage";
 let batteryObj;
 let refreshInt;
 let rndName = "pwa-x192.png";
@@ -22,13 +23,28 @@ document.querySelector("h1").innerText =
   window.location.pathname.split("/")[1].charAt(0).toUpperCase() +
   window.location.pathname.split("/")[1].slice(1);
 
+  let fetchStyle = function(url) {
+    return new Promise((resolve, reject) => {
+      let link = document.createElement('link');
+      link.type = 'text/css';
+      link.rel = 'stylesheet';
+      link.onload = () => resolve();
+      link.onerror = () => reject();
+      link.href = url;
+  
+      let headScript = document.querySelector('script');
+      headScript.parentNode.insertBefore(link, headScript);
+    });
+  };
+
 const glyphArr = [
   "home.svg",
   "cog.svg",
   "wifi.svg",
   "update.svg",
-  "menu.svg",
   "terminal.svg",
+  "menu.svg",
+  "close.svg",
 ];
 glyphArr.forEach((elem, i) => {
   loadTheFile(glyphArr[i]).then((icon) => {
@@ -103,20 +119,22 @@ const jsFiles = [
   "initBatteryArray.js",
   "btr2refrshlvlJs.js",
   "onBTRMessage.js",
-  "onNetMessage.js",
+  "onTermMessage.js",
 ];
-var wSock = document.wSock;
+let wSock;
 // var gateway = "ws://" + "async-x.local" + "/ws";
-// var gateway = "ws://" + "esp-async.local" + "/ws";
-// var gateway = "ws://" + window.location.hostname + "/ws";
+// var gateway1 = "ws://" + "cccp.local" + "/ws";
+// var gateway1 = "ws://" + "10.1.1.1" + "/ws";
 // var gateway1 = "ws://" + window.location.hostname + "/ws";
-var gateway2 = "ws://" + "bmsesp2.local" + "/ws";
+var gateway1 = "ws://" + window.location.hostname + "/ws";
+// var gateway2 = "ws://" + "bmsesp2.local" + "/ws";
 async function socktRuner() {
   return new Promise((resolve, reject) => {
-    wSock = new WebSocket(gateway2);
+    wSock = new WebSocket(gateway1);
     wSock.onopen = (e) => {
       console.log("WS opened");
       console.log(e);
+      document.websocket = wSock;
       resolve(wSock);
     };
     wSock.onclose = (e) => {
@@ -242,7 +260,14 @@ if (window.location.pathname == "/") {
     //   websocket.send("netscan");
     //   websocket.send("ip");
   });
+  let hostName;
 
+  let hostNameElem = document.querySelector("#hostname > a").href;
+  if (hostNameElem.split("://").length > 1) {
+    let tmpElem = hostNameElem.split("://")[1];
+    hostName = tmpElem.split(".local")[0];
+  }
+  if (!hostName) hostName = `bms-${(Math.random() * 1000).toFixed(0)}`;
   document.querySelector("#card").innerHTML = `
     <p><button id="netscan" class="button">Scan</button></p>
     <h2>Scaned Stations</h2>
@@ -251,8 +276,17 @@ if (window.location.pathname == "/") {
     </div>
     <h4>Connect to network:</h4>
     <div class="credentials">
-    <input id="ssidInput" type='text' placeholder='network' name='n'/>
-    <hr /><input id="ssidPassword" type='password' placeholder='password' name='p'/>
+    <div>
+    <span>SSID:</span><input id="ssidInput" type='text' placeholder='network' name='n'/>
+    </div>
+    <hr />
+<div>
+<span>PASS:</span><input id="ssidPassword" type='password' placeholder='password' name='p'/>
+</div>
+    <hr />
+    <div>
+    <span>http://</span><input id="hostName" type='text' value ='${hostName}' placeholder='hostname' name='h'/><span>.local</span>
+    </div>
     <hr /><button class="button" id="credits">Connect</button>
     </div>
     `;
@@ -267,7 +301,8 @@ if (window.location.pathname == "/") {
   document.querySelector("#credits").addEventListener("mousedown", (e) => {
     let ssid = document.querySelector("#ssidInput").value;
     let ssidPasswd = document.querySelector("#ssidPassword").value;
-    wSock.send("PWD--" + ssid + "-passwd-" + ssidPasswd);
+    let hostName = document.querySelector("#hostName").value;
+    wSock.send("PWD--" + ssid + "::" + ssidPasswd + "::" + hostName);
     document.querySelector("#scanStations").innerHTML = "";
     let preloader = document.createElement("span");
     preloader.classList.add("loader-89");
@@ -304,26 +339,65 @@ if (window.location.pathname == "/") {
       }
     };
   });
+//   <form method="POST" action="http://cccp.local/update" enctype="multipart/form-data">
 
   document.querySelector("#card").innerHTML = `
-
     <form method="POST" action="/update" enctype="multipart/form-data">
     <input class="button" type="file" accept=".bin" name="update">
-    <input class="button" type="submit" value="Update"></form>`;
+    <input class="button" type="submit" value="Update"></form>
+    `;
+let cnv = document.createElement("canvas");
+cnv.width = "500";
+cnv.height = "200";
+let ctx = cnv.getContext("2d");
+document.querySelector("body > div.content").appendChild(cnv);
+let RNDR;
+let fontSize = 200;
+let counter = 0.0;
+let now = performance.now();
+function ctxRender() {
+    RNDR = requestAnimationFrame(ctxRender);
+    ctx.clearRect(0,0,cnv.width,cnv.height);
+    ctx.textAlign = "center";
+    ctx.font = "100px MMD";
+	ctx.textBaseline = "middle";
+	ctx.imageSmoothingQuality = "high";
+    ctx.fillStyle = "#fff";
+    ctx.fillText(((performance.now()-now)/1000).toFixed(1),cnv.width/2,cnv.height/2);
+    // ctx.fillText((counter/1000).toFixed(3),cnv.width/4,cnv.height/2);
+    
+    // counter+=(1000/60);
+} 
 
+// 
+document.querySelector("#card > form > input:nth-child(2)").onmousedown = (e)=>{
+// 
+// document.querySelector("canvas").onmousedown = (e)=>{
+    ctxRender();
+    now = performance.now();
+    console.log(e.target);
+}
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
+  ///////////////////                      ///////////////////////////
+  ///////////////////      TERMINAL        ///////////////////////////
+  ///////////////////                      ///////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 } else if (window.location.pathname == "/terminal") {
-  socktRuner().then((reslt) => {
+    document.querySelector("#card").innerHTML = `
+   <div id="terminalWindow">
+   <div id="termFrame"></div>
+   </div>`;
+
+  
+    socktRuner().then((reslt) => {
     // console.log(e)
     reslt.send("ip");
     reslt.send("batteryStatus");
+    reslt.send("terminal");
 
     console.log(reslt);
     reslt.onmessage = (e) => {
@@ -334,6 +408,9 @@ if (window.location.pathname == "/") {
         case "IP-":
           onIPMessage.exec(e);
           break;
+        case "TRM":
+          onTermMessage.exec(e);
+          break;
 
         default:
           onIPMessage.exec(e);
@@ -342,10 +419,7 @@ if (window.location.pathname == "/") {
     };
   });
 
-  document.querySelector("#card").innerHTML = `
-   <form method="POST" action="/update" enctype="multipart/form-data">
-    <input class="button" type="file" accept=".bin" name="update">
-    <input class="button" type="submit" value="Update"></form>`;
+
 
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////

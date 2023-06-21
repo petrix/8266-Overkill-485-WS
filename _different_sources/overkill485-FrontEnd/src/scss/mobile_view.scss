@@ -5,55 +5,29 @@
     & > h1 {
       margin: 10px 0;
     }
-    & > a {
+    & >div{
+    //     &> a {
 
-    //   & > img {
-    //     top: 10px;
-    //     width: 30px;
-    //     // display: none;
-    //   }
-    }
-      a#glyph0 {
-        & > img {
-            left: 20px;
-        }
+    // //   & > img {
+    // //     top: 10px;
+    // //     width: 30px;
+    // //     // display: none;
+    // //   }
+    // }
+
+       a#glyph5 {
+         display: none;
+
       }
-      a#glyph1 {
-        & > img {
-            right: 20px;
-        }
-      }
-      a#glyph2 {
-        & > img {
-            right: 70px;
-        }
-      }
-      a#glyph3 {
-        & > img {
-            right: 120px;
-        }
-      }
-      a#glyph5 {
-        & > img {
-            right: 170px;
-        }
-      }
-      a#glyph4 {
-        & > img {
-            left: 20px;
-          display: none;
-        }
+      a#glyph6 {
+        display: none;
+
       }
       a>img{
-        top:10px;
+        // top:10px;
         width: 30px;
       }
   }
-  #footer{
-    height:50px;
-    &>p{
-        font-size: 15px;
-    }
   }
 }
 
@@ -64,62 +38,54 @@
     & > h1 {
       margin: 10px 0;
     }
-    & > a {
-
-    //   & > img {
-    //     top: 10px;
-    //     width: 30px;
-    //     // display: none;
-    //   }
+    & >div{
+        &.rightSection{
+            // display: none;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s;
+        }
+        &> 
+    a#glyph0{
+        display: none;
     }
-      a#glyph0 {
-        & > img {
-            left: 20px;
-          top: 10px;
-          width: 30px;
-          display: none;
+    
+      a#glyph5,a#glyph6 {
+        display: block;
+        // opacity: 1;
+        position: absolute;
+        top:10px;
+        // animation: opacity 0.5s forwards;
+        animation-play-state: paused;
+      }
+      a#glyph5{
+        opacity: 1;
+        display: block;
+      }
+      a#glyph6{
+        opacity: 1;
+        display: none;
+      }
+      @keyframes show {
+        0% { 
+            opacity: 0;
+            transform: rotate(90deg);
+         }
+        100% { 
+            opacity: 1;
+            transform: rotate(0deg);
+         }
+      }
+      @keyframes hide {
+        0% { 
+            opacity: 1;
+            transform: rotate(0deg);
+         }
+        100% { 
+            opacity: 0;
+            transform: rotate(-90deg);
         }
       }
-      a#glyph1 {
-        & > img {
-            right: 20px;
-          top: 10px;
-          width: 30px;
-          display: none;
-        }
-      }
-      a#glyph2 {
-        & > img {
-            right: 70px;
-          top: 10px;
-          width: 30px;
-          display: none;
-        }
-      }
-      a#glyph3 {
-        & > img {
-            right: 120px;
-          top: 10px;
-          width: 30px;
-          display: none;
-        }
-      }
-      a#glyph5 {
-        & > img {
-          width: 30px;
-          display: none;
-        }
-      }
-      a#glyph4 {
-        & > img {
-            left: 20px;
-          top: 10px;
-          width: 30px;
-          display: block;
-        }
-      }
-  }
-}
-// @include sm-screen{
 
-// }
+  }}
+}

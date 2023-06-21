@@ -37,8 +37,27 @@
 #endif
 
 #include <NTPClient.h>
+#define USE_SERIAL_1602_LCD
+#define LCD_I2C_ADDRESS 0x27   // Default LCD address is 0x27 for a 20 chars and 4 line / 2004 display
+#include "LiquidCrystal_I2C.h" // Use an up to date library version which has the init method
+// #define _LCD_TYPE 1
+// #include <LCD_1602_RUS_ALL.h>
+LiquidCrystal_I2C myLCD(LCD_I2C_ADDRESS, 16, 2);
 
-const long utcOffsetInSeconds = 0;
+byte rightUpAnode[8] = {0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11110, 0b11110, 0b11110};
+byte rightDownAnode[8] = {0b11110, 0b11110, 0b11110, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000};
+byte leftUpKathode[8] = {0b11111, 0b10000, 0b10111, 0b10111, 0b10111, 0b10111, 0b10111, 0b10111};
+byte leftDownKathode[8] = {0b10111, 0b10111, 0b10111, 0b10111, 0b10111, 0b10111, 0b10000, 0b11111};
+
+byte upperFull[8] = {0b11111, 0b00000,0b11111,  0b11111, 0b11111, 0b11111, 0b11111, 0b11111};
+byte upperClear[8] = {0b11111, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000};
+byte lowerFull[8] = {0b11111, 0b11111, 0b11111, 0b11111, 0b11111,  0b11111,0b00000, 0b11111};
+byte lowerClear[8] = {0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b11111};
+// Выделим два переопределяемых символа
+//  LCD_1602_RUS myLCD(0x27, 16, 2, 2);
+//                            ^^^ количество пользовательских символов
+
+const long utcOffsetInSeconds = 10800;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
@@ -47,8 +66,11 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
 #include <EEPROM.h>
 
-char mainSSID[33] = "";
-char mainPASSWD[65] = "";
+// char mainSSID[33] = "";
+// char mainPASSWD[65] = "";
+char mainSSID[30] = "";
+char mainPASSWD[34] = "";
+char mainHOSTNAME[34] = "";
 
 #include "credentials.h"
 #include "home_svg.h"
@@ -93,12 +115,13 @@ void postTransmission()
 #define APPSK "xxxxxxxx"
 #endif
 
-bool netScan = 0;
+bool idle_state = true;
 bool ledState = 0;
 bool mbScan = 0;
 bool regScan = 0;
 const int ledPin = 2;
 uint8_t scan_client_id;
+uint8_t terminal_client_id;
 uint8_t pwd_client_id;
 uint8_t bmsStat_client_id;
 
@@ -153,9 +176,17 @@ bool ws_conn = false;
 void WiFiSoftAPSetup()
 {
     WiFi.softAPConfig(apIP, apIP, netMsk);
-    WiFi.softAP(softAP_ssid, softAP_password);
-    // WiFi.setHostname(hostName);
-    WiFi.hostname(hostName);
+    if (mainHOSTNAME)
+    {
+        WiFi.softAP(mainHOSTNAME, softAP_password);
+        WiFi.hostname(mainHOSTNAME);
+    }
+    else
+    {
+        WiFi.softAP(softAP_ssid, softAP_password);
+        WiFi.hostname(hostName);
+    }
+
     delay(500); // Without delay I've seen the IP address blank
     Serial.print("softAP IP address: ");
     Serial.println(WiFi.softAPIP());
@@ -175,7 +206,7 @@ public:
 
     bool canHandle(AsyncWebServerRequest *request)
     {
-        request->addInterestingHeader("ANY");
+        // request->addInterestingHeader("ANY");
         return true;
     }
 
@@ -186,6 +217,42 @@ public:
         request->send(response);
     }
 };
+
+//  class CaptiveRequestHandler : public AsyncWebHandler
+// {
+// public:
+//     CaptiveRequestHandler()
+//     {
+//         /* THIS IS WHERE YOU CAN PLACE THE CALLS */
+//         server.onNotFound(notFound);
+//         //  CAUTION: I could not get it work the code commented
+//         //      //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+//         server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request)
+//                   { request->send(200, "text/html", index_html); });
+//         // Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+//         server.on("/fwlink", HTTP_GET, [](AsyncWebServerRequest *request)
+//                   { request->send(200, "text/html", handleRequest); });
+//         server.on("/connectivitycheck.gstatic.com", HTTP_GET, [](AsyncWebServerRequest *request)
+//                   { request->send(200, "text/html", handleRequest); });
+//         server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request)
+//                   { request->send(200, "text/html", handleRequest); });
+//         server.on("/captive.apple.com", HTTP_GET, [](AsyncWebServerRequest *request)
+//                   { request->send(200, "text/html", handleRequest); });
+//     }
+//     virtual ~CaptiveRequestHandler() {}
+
+//     bool canHandle(AsyncWebServerRequest *request)
+//     {
+//         return true;
+//     }
+
+//     void handleRequest(AsyncWebServerRequest *request)
+//     {
+//         server.rewrite("/", "/netscan").setFilter(ON_AP_FILTER);
+//         AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", index_html);
+//         request->send(response);
+//     }
+// };
 
 void writeRegValue(uint8_t RWWclientID, uint8_t RWWtype, uint8_t RWWregSpeed, uint8_t RWWdevID, uint16_t RWWReg, uint16_t RWWvalue)
 {
@@ -238,7 +305,7 @@ void sendBatteryStatus(int cliId)
     json += ",\"faultCount\":" + String(bms.get_fault_count());
     json += ",\"protection_status\":" + String(bms.get_protection_status_summary());
     json += ",\"cycleCount\":" + String(bms.get_cycle_count());
-    json += ",\"currentTime\":" + String(timeClient.getEpochTime());
+    json += ",\"currentTime\":" + String(timeClient.getEpochTime() - utcOffsetInSeconds);
 
     json += "}";
 
@@ -253,10 +320,12 @@ void sendBatteryStatus(int cliId)
     }
 
     json = String();
-
-    // netScan = false;
 }
-
+void webTerm(String message){
+    if(terminal_client_id>0){
+        ws.textAll((String)"TRM--"+String(timeClient.getEpochTime() - utcOffsetInSeconds)+"--"+message);
+    }
+}
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len, AsyncWebSocketClient *client)
 {
     AwsFrameInfo *info = (AwsFrameInfo *)arg;
@@ -269,6 +338,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len, AsyncWebSocket
         String message = (char *)data;
         // Serial.println(String((char *)data));
         Serial.printf("WebSocket client ID: #%u \n", client->id());
+        webTerm((String)"WS#"+client->id()+"-:Message:-"+message);
         if (strcmp((char *)data, "toggle") == 0)
         {
             ledState = !ledState;
@@ -285,7 +355,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len, AsyncWebSocket
             ipMsg += "-:softap:-";
             ipMsg += WiFi.softAPIP().toString().c_str();
             ipMsg += "-:hostname:-";
-            ipMsg += WiFi.getHostname();
+            ipMsg += String(mainHOSTNAME);
             ipMsg += "-:ssid:-";
             ipMsg += String(mainSSID);
             ipMsg += "-:passwd:-";
@@ -305,11 +375,27 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len, AsyncWebSocket
             // ws.text(sendBatteryStatus());
             // sendBatteryStatus(id);
         }
+        else if (strcmp((char *)data, "reset") == 0)
+        {
+            ESP.reset();
+            // ESP.updateSketch();
+        }
+        else if (strcmp((char *)data, "config") == 0)
+        {
+            ESP.eraseConfig();
+            // ESP.updateSketch();
+        }
+        else if (strcmp((char *)data, "restart") == 0)
+        {
+            ESP.restart();
+        }
+        else if (strcmp((char *)data, "terminal") == 0)
+        {
+            terminal_client_id = client->id();
+        }
         else if (strcmp((char *)data, "netscan") == 0)
         {
             scan_client_id = client->id();
-
-            netScan = true;
         }
         else if (strcmp((char *)data, "scanmodbus") == 0)
         {
@@ -350,22 +436,32 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len, AsyncWebSocket
         }
         else if ((message.substring(0, message.indexOf("--")) == "PWD"))
         {
-             pwd_client_id = client->id();
+            pwd_client_id = client->id();
             Serial.println("PWD");
             String tmp1 = message.substring(message.indexOf("--") + 2, message.length());
             Serial.println(tmp1);
-            String tmpSSID = tmp1.substring(0, tmp1.indexOf("-passwd-"));
+            String tmpSSID = tmp1.substring(0, tmp1.indexOf("::"));
             Serial.println(tmpSSID);
-            String tmpPASSWD = tmp1.substring(tmp1.indexOf("-passwd-") + 8, tmp1.length());
+            String tmp2 = tmp1.substring(tmp1.indexOf("::") + 2, tmp1.length());
+            Serial.println(tmp2);
+            String tmpPASSWD = tmp2.substring(0, tmp2.indexOf("::"));
             Serial.println(tmpPASSWD);
-            // char xSSID[33] = "";
-            // char xPASSWD[65] = "";
+            String tmpHOSTNAME = tmp2.substring(tmp2.indexOf("::") + 2, tmp2.length());
+            Serial.println(tmpHOSTNAME);
+
             tmpSSID.toCharArray(mainSSID, tmpSSID.length() + 1);
             tmpPASSWD.toCharArray(mainPASSWD, tmpPASSWD.length() + 1);
+            tmpHOSTNAME.toCharArray(mainHOSTNAME, tmpHOSTNAME.length() + 1);
             Serial.print("xSSID: ");
             Serial.println(mainSSID);
             Serial.print("And xPASSWD : ");
             Serial.println(mainPASSWD);
+            Serial.print("And xHOSTNAME : ");
+            Serial.println(mainHOSTNAME);
+
+            // char xSSID[33] = "";
+            // char xPASSWD[65] = "";
+
             //      WiFiStationSetup(tmpSSID, tmpPASSWD);
             //      connectWifi();
             //      if (connectWifi(xSSID, xPASSWD)){
@@ -415,9 +511,12 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
     {
     case WS_EVT_CONNECT:
         Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+        webTerm((String)"WS#"+ client->id()+" connected from "+client->remoteIP().toString().c_str());
         break;
     case WS_EVT_DISCONNECT:
         Serial.printf("WebSocket client #%u disconnected\n", client->id());
+        webTerm((String)"WebSocket client #"+ client->id()+" disconnected ");
+
         break;
     case WS_EVT_DATA:
         handleWebSocketMessage(arg, data, len, client);
@@ -502,12 +601,12 @@ void setupWebServer()
     server.on("/btr2refrshlvlJs.js", HTTP_GET, [](AsyncWebServerRequest *request)
               { AsyncWebServerResponse *response = request->beginResponse_P(200,"text/javascript", btr2refrshlvlJs);
                request->send(response); });
-    server.on("/onIPMessage.js", HTTP_GET, [](AsyncWebServerRequest *request)
-              { AsyncWebServerResponse *response = request->beginResponse_P(200,"text/javascript", onIPMessage);
-               request->send(response); });
-    server.on("/onNetMessage.js", HTTP_GET, [](AsyncWebServerRequest *request)
-              { AsyncWebServerResponse *response = request->beginResponse_P(200,"text/javascript", onNetMessage);
-               request->send(response); });
+    // server.on("/onIPMessage.js", HTTP_GET, [](AsyncWebServerRequest *request)
+    //           { AsyncWebServerResponse *response = request->beginResponse_P(200,"text/javascript", onIPMessage);
+    //            request->send(response); });
+    // server.on("/onNetMessage.js", HTTP_GET, [](AsyncWebServerRequest *request)
+    //           { AsyncWebServerResponse *response = request->beginResponse_P(200,"text/javascript", onNetMessage);
+    //            request->send(response); });
     //    request->send(200, "text/javascript", wsJs_file); });
     server.on("/home.svg", HTTP_GET, [](AsyncWebServerRequest *request)
               { AsyncWebServerResponse *response = request->beginResponse_P(200,"image/svg+xml", home_svg);
@@ -523,6 +622,9 @@ void setupWebServer()
                request->send(response); });
     server.on("/menu.svg", HTTP_GET, [](AsyncWebServerRequest *request)
               { AsyncWebServerResponse *response = request->beginResponse_P(200,"image/svg+xml", menu_svg);
+               request->send(response); });
+    server.on("/close.svg", HTTP_GET, [](AsyncWebServerRequest *request)
+              { AsyncWebServerResponse *response = request->beginResponse_P(200,"image/svg+xml", close_svg);
                request->send(response); });
     server.on("/terminal.svg", HTTP_GET, [](AsyncWebServerRequest *request)
               { AsyncWebServerResponse *response = request->beginResponse_P(200,"image/svg+xml", terminal_svg);
@@ -558,10 +660,6 @@ void setupWebServer()
     server.on("/pwa-x192.png", HTTP_GET, [](AsyncWebServerRequest *request)
               { AsyncWebServerResponse *response = request->beginResponse_P(200,"image/png", pwa_x192, pwa_x192_len);
                request->send(response); });
-
-    //     server.on("/netscan", HTTP_GET, [](AsyncWebServerRequest *request)
-    //   {
-    //     request->send_P(200, "text/html", netScan_html, processor); });
 
     server.on("/info", HTTP_GET, [](AsyncWebServerRequest *request)
               {
@@ -745,9 +843,9 @@ void setupWebServer()
     server.on(
         "/update", HTTP_POST, [](AsyncWebServerRequest *request)
         {
-            if (!request->authenticate(http_username, http_password)){
-                return request->requestAuthentication();
-              }
+            // if (!request->authenticate(http_username, http_password)){
+            //     return request->requestAuthentication();
+            //   }
       shouldReboot = !Update.hasError();
       shouldReboot ? rebootTimer = millis() : false;
       AsyncWebServerResponse *response = request->beginResponse(200, "text/html", shouldReboot ? webUpdate_ok_html : webUpdate_fail_html);
@@ -824,11 +922,16 @@ void connectWifi()
         WiFi.begin(mainSSID, mainPASSWD);
 
         int connRes = WiFi.waitForConnectResult();
-        // WiFi.setHostname(hostName);
-        WiFi.hostname(hostName);
+        // WiFi.hostname(hostName);
+        WiFi.hostname(mainHOSTNAME);
         Serial.print("connRes: ");
         Serial.println(connRes);
-        String sendMsg = String(connRes) + ":" + mainSSID + ":" + mainPASSWD;
+        String sendMsg = "NCSucessful:-";
+        sendMsg += mainSSID;
+        sendMsg += "-:pwd:-";
+        sendMsg += mainPASSWD;
+        sendMsg += "-:hostname:-";
+        sendMsg += mainHOSTNAME;
         ws.text(pwd_client_id, sendMsg);
         //      return connRes;
     }
@@ -863,8 +966,7 @@ void sendWifiScanResult(int n)
     ws.text(scan_client_id, (String)json);
     // ws.textAll((String)json);
     json = String();
-
-    netScan = false;
+    scan_client_id = 0;
 }
 
 void setup()
@@ -873,6 +975,28 @@ void setup()
     pinMode(rs485_DE, OUTPUT);
     preTransmission();
     postTransmission();
+    loadCredentials();
+    myLCD.init();
+    myLCD.clear();
+    myLCD.backlight();
+    myLCD.setCursor(1, 0);
+    myLCD.print("ЖОПА POWERBANK");
+    myLCD.setCursor(2, 1);
+    myLCD.print(__DATE__);
+
+    myLCD.createChar(0, leftUpKathode);
+    myLCD.createChar(1, leftDownKathode);
+    myLCD.createChar(2, upperClear);
+    myLCD.createChar(3, lowerClear);
+    myLCD.createChar(4, upperFull);
+    myLCD.createChar(5, lowerFull);
+    myLCD.createChar(6, rightUpAnode);
+    myLCD.createChar(7, rightDownAnode);
+    // bigNumberLCD.disableGapBetweenNumbers();
+
+    // bigNumberLCD.setBigNumberCursor(0);
+    // bigNumberLCD.print(F("--" ONE_COLUMN_SPACE_STRING "47.11"));
+    // bigNumberLCD.writeAt(':',19); // Because numbers have by default a trailing but no leading gap.
 
     Serial.begin(115200);
 
@@ -899,7 +1023,7 @@ void setup()
     /* Setup the DNS server redirecting all the domains to the apIP */
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(DNS_PORT, "*", apIP);
-    loadCredentials();
+
     connectWifi();
     Serial.println("");
     Serial.print("local IP Address: ");
@@ -918,13 +1042,127 @@ void setup()
     timeClient.begin();
 }
 uint32_t timer2 = millis();
+uint32_t timer3 = millis();
+bool changedDisplay = false;
+void dispLayout1()
+{
+    String time = timeClient.getFormattedTime();
+
+    uint8_t day = timeClient.getDay();
+
+    myLCD.setCursor(0, 0);
+    myLCD.print(time);
+    myLCD.setCursor(9, 0);
+    myLCD.print("Ёмк.");
+    myLCD.print((String)bms.get_state_of_charge() + "%");
+
+    myLCD.setCursor(0, 1);
+    myLCD.print((String)bms.get_voltage());
+    myLCD.print("V");
+
+    myLCD.setCursor(8, 1);
+    myLCD.print((String)bms.get_current());
+    myLCD.print("A");
+}
+
+void dispLayout2()
+{
+    uint8_t stateOfCharge = bms.get_state_of_charge();
+            myLCD.setCursor(0, 0);
+            myLCD.write(0);
+            myLCD.setCursor(0, 1);
+            myLCD.write(1);
+    for (size_t i = 1; i < 9; i++)
+    {
+        if (i * 13 < stateOfCharge)
+        {
+            myLCD.setCursor(i, 0);
+            myLCD.write(4);
+            myLCD.setCursor(i, 1);
+            myLCD.write(5);
+        }
+        else
+        {
+            myLCD.setCursor(i, 0);
+            myLCD.write(2);
+            myLCD.setCursor(i, 1);
+            myLCD.write(3);
+        }
+    }
+            myLCD.setCursor(9, 0);
+            myLCD.write(6);
+            myLCD.setCursor(9, 1);
+            myLCD.write(7);
+
+
+
+            myLCD.setCursor(10, 0);
+            myLCD.print((String)bms.get_voltage()+"V   ");
+            myLCD.setCursor(10, 1);
+            myLCD.print((String)bms.get_current()+"A   ");
+}
+
 void loop()
 {
-    if (millis() - timer2 > 5000)
+
+    if (idle_state)
     {
+
+        // bigNumberLCD.setBigNumberCursor(0);
+        // dispLayout1();
+        if (!changedDisplay)
+        {
+            myLCD.clear();
+
+            changedDisplay = true;
+        }
+        dispLayout2();
+        idle_state = !idle_state;
+        timer3 = millis();
+    }
+
+    if (millis() - timer3 > 1000)
+    {
+        idle_state = true;
+        timer3 = millis();
+    }
+    if (millis() - timer2 > 15000)
+    {
+
         timer2 = millis();
         timeClient.update();
 
+        // idle_state = false;
+        // timer3 = millis();
+        // myLCD.clear();
+        // // myLCD.home();
+
+        // bigNumberLCD.print(bms.get_voltage());
+
+        // bigNumberLCD.print(bms.get_current());
+
+        // Serial.println((String)"Vcc\t\t\t\t\t\t"+ESP.getVcc());
+        // Serial.println((String)"BootVersion\t\t"+ESP.getBootVersion());
+        // Serial.println((String)"CpuFreqMHz\t\t"+ESP.getCpuFreqMHz());
+        // Serial.println((String)"CycleCount\t\t"+ESP.getCycleCount());
+        // Serial.println((String)"FlashChipId\t\t"+ESP.getFlashChipId());
+        // Serial.println((String)"FlashChipMode\t\t"+ESP.getFlashChipMode());
+        // Serial.println((String)"FlashChipRealSize\t\t"+ESP.getFlashChipRealSize());
+        // Serial.println((String)"FlashChipSize\t\t"+ESP.getFlashChipSize());
+        // Serial.println((String)"FlashChipSizeByChipIdn\t\t"+ESP.getFlashChipSizeByChipId());
+        // Serial.println((String)"FlashChipSpeed\t\t"+ESP.getFlashChipSpeed());
+        // Serial.println("--------------------------");
+        // Serial.println((String)"FreeContStack\t\t"+ESP.getFreeContStack());
+        // Serial.println((String)"FreeHeap\t\t"+ESP.getFreeHeap());
+        // Serial.println((String)"FreeSketchSpace\t\t"+ESP.getFreeSketchSpace());
+        // Serial.println((String)"FullVersion\t\t"+ESP.getFullVersion());
+        // Serial.println((String)"HeapFragmentation\t\t"+ESP.getHeapFragmentation());
+        // Serial.println((String)"ResetInfo\t\t"+ESP.getResetInfo());
+        // Serial.println((String)"ResetReason\t\t"+ESP.getResetReason());
+        // Serial.println((String)"SdkVersion\t\t"+ESP.getSdkVersion());
+        // Serial.println((String)"SketchMD5\t\t"+ESP.getSketchMD5());
+        // Serial.println((String)"SketchSize\t\t"+ESP.getSketchSize());
+        // Serial.println("--------------------------");
         // Serial.print(daysOfTheWeek[timeClient.getDay()]);
         // Serial.print(", ");
         // Serial.print(timeClient.getHours());
@@ -966,7 +1204,7 @@ void loop()
         sendBatteryStatus(bmsStat_client_id);
         bmsStat_client_id = 0;
     }
-    if (netScan)
+    if (scan_client_id)
     {
         WiFi.scanNetworksAsync(sendWifiScanResult, true);
     }
@@ -995,21 +1233,33 @@ void loop()
             status = s;
             if (s == WL_CONNECTED)
             {
+                idle_state = false;
+                timer3 = millis();
                 /* Just connected to WLAN */
                 Serial.println("");
                 Serial.print("Connected to ");
                 Serial.println(mainSSID);
                 Serial.print("IP address: ");
                 Serial.println(WiFi.localIP());
-
+                myLCD.clear();
+                myLCD.home();
+                myLCD.print("SSID:");
+                myLCD.print(mainSSID);
+                myLCD.setCursor(0, 1);
+                myLCD.print("IP:");
+                myLCD.print(WiFi.localIP().toString().c_str());
                 // Setup MDNS responder
-                if (!MDNS.begin(hostName))
+                if (!MDNS.begin(mainHOSTNAME))
                 {
                     Serial.println("Error setting up MDNS responder!");
                 }
                 else
                 {
                     Serial.println("mDNS responder started");
+                    myLCD.home();
+                    myLCD.print(" mDNS started ");
+                    myLCD.clear();
+
                     // Add service to MDNS-SD
                     MDNS.addService("http", "tcp", 80);
                 }

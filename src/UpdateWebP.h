@@ -68,6 +68,30 @@ const char webUpdate_html[] PROGMEM = R"rawliteral(
   </div>
   </div>
   <script>
+
+let cnv = document.createElement("canvas");
+cnv.width = "500";
+cnv.height = "200";
+let ctx = cnv.getContext("2d");
+document.querySelector("body > div.content").appendChild(cnv);
+let RNDR;
+let fontSize = 200;
+let counter = 0.0;
+let now = performance.now();
+function ctxRender() {
+    RNDR = requestAnimationFrame(ctxRender);
+    ctx.clearRect(0,0,cnv.width,cnv.height);
+    ctx.textAlign = "center";
+    ctx.font = "100px MMD";
+	ctx.textBaseline = "middle";
+	ctx.imageSmoothingQuality = "high";
+    ctx.fillStyle = "#fff";
+    ctx.fillText(((performance.now()-now)/1000).toFixed(1),cnv.width/4,cnv.height/2);
+    // ctx.fillText((counter/1000).toFixed(3),cnv.width/2,cnv.height/2);
+    
+    // counter+=(1000/60);
+} 
+ctxRender();
   var gateway = `ws://${window.location.hostname}/ws`;
   var websocket;
   window.addEventListener('load', onLoad);

@@ -1,5 +1,4 @@
 export const onIPMessage = {};
-
 onIPMessage.exec = (event) => {
   const data = event.data;
   console.log("IP Messages================================================");
@@ -24,7 +23,9 @@ onIPMessage.exec = (event) => {
           document.querySelector("#netName").innerHTML = value;
           break;
         case "hostname":
-          document.querySelector("#hostname").innerHTML = value;
+          document.querySelector(
+            "#hostname"
+          ).innerHTML = `<a href="http://${value}.local">http://${value}.local</a>`;
           break;
 
         default:
@@ -52,6 +53,15 @@ onIPMessage.exec = (event) => {
     let ssidPwd = crd.split("-passwd-")[1];
     document.querySelector("#scanStations").innerHTML =
       "Connected to " + ssid + "<br>" + "with password : " + ssidPwd;
+  } else if (data.slice(0, 3) === "NCS") {
+    console.log("NCS");
+    let arr1 = data.split("-:");
+    let ssid = arr1[0].split(":-")[1];
+    let ssidPwd = arr1[1].split(":-")[1];
+    let hostName = `http://${arr1[2].split(":-")[1]}.local`;
+    document.querySelector(
+      "#scanStations"
+    ).innerHTML = `Connected to ${ssid} with password : ${ssidPwd}<br> hostname : ${hostName}`;
   } else {
     console.log(data);
   }
