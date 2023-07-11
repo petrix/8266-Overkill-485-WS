@@ -10,13 +10,22 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  transform: rotate(90deg);
 }
 
 .percentage {
   font-size: 100%;
   // font-weight: bold;
   color: white;
-  margin-top: 15px;
+//   margin-top: 15px;
+  margin-top: -35px;
+  font-family: "MMD";
+  // color: #143642;
+  font-size: 25px;
+  // font-weight: bold;
+  display: flex;
+  flex-direction: row;
+  transform: rotate(-90deg) translate(40px, 0px);
 }
 .percentage i {
   margin-right: 6px;
@@ -169,7 +178,7 @@
   justify-content: space-between;
   align-items: center;
   color: white;
-  font-family: monospace;
+  font-family: "Comfortaa";
   font-size: 2.2em;
 }
 .batteryStats > div {
@@ -203,7 +212,7 @@
   }
 }
 .ntcsStats > span {
-  transform: rotate(-90deg) translate(130px, 0px);
+//   transform: rotate(-90deg) translate(130px, 0px);
   @include xs-mobile {
     // transform: none;
   }
@@ -218,7 +227,7 @@
   // -webkit-text-stroke-width: 1.1px;
   // -webkit-text-stroke-color: #bdbdbd;
   margin-top: -35px;
-  font-family: monospace;
+  font-family: "MMD";
   // color: #143642;
   font-size: 25px;
   // font-weight: bold;
@@ -228,7 +237,7 @@
 }
 
 
-body > div.topnav > h1::before {
+body > nav > h1::before {
   content: "";
   // background-color: #143642;
 
@@ -245,7 +254,7 @@ body > div.topnav > h1::before {
 
 
 
-body > div.topnav > h1::after {
+body > nav > h1::after {
   content: "";
   // background-color: #143642;
 
@@ -259,7 +268,7 @@ body > div.topnav > h1::after {
   background: linear-gradient(270deg, #143642, #143642, #143642, #143642);
   transition: opacity 0.5s;
 }
-body > div.topnav > h1.charging::after {
+body > nav > h1.charging::after {
   content: "";
   /* background-color: #ac294d; */
   position: absolute;
@@ -274,7 +283,7 @@ body > div.topnav > h1.charging::after {
 
 
 
-body > div.topnav > h1.discharging::after {
+body > nav > h1.discharging::after {
   content: "";
   /* background-color: #48ac29; */
   position: absolute;
@@ -286,6 +295,9 @@ body > div.topnav > h1.discharging::after {
   background: linear-gradient(270deg, #0000, #29ac60, #29ac60, #0000);
 
 }
-  body > div.topnav > h1.discharging::before {
+  body > nav > h1.charging::before {
+    opacity: 0;
+  }
+  body > nav > h1.discharging::before {
     opacity: 0;
   }

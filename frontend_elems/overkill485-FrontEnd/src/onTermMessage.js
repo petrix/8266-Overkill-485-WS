@@ -14,14 +14,24 @@ onTermMessage.exec = (event) => {
     let hh = d.getHours();
     let mm = d.getMinutes();
     let ss = d.getSeconds();
-    msg += `${hh}:${mm}:${ss}`;
+    if(hh<10)msg+="0";
+    msg+=hh;
     msg+=":";
+    if(mm<10)msg+="0";
+    msg+=mm;
+    msg+=":";
+    if(ss<10)msg+="0";
+    msg+=ss;
+
+    // msg += `${hh}:${mm}:${ss}`;
+
     msg+=pl1;
 
    const termFrame =  document.querySelector("#termFrame");
     let div = document.createElement("div");
     div.innerText = msg;
     termFrame.appendChild(div);
+    div.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
 // console.log();
 
   } else {

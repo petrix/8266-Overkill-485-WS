@@ -65,7 +65,7 @@ h4 {
     color: #ccc;
 }
 
-.topnav {
+nav {
     overflow: hidden;
     display: flex;
     flex-direction: row;
@@ -79,75 +79,52 @@ h4 {
     height: 70px;
     z-index: 1;
     box-shadow: 2px 2px 12px 1px rgba(0, 0, 0, 0.5);
-
-    //   a#glyph0 {
-    //     & > img {
-    //     //   left: 20px;
-    //     }
-    //   }
-    //   a#glyph1 {
-    //     & > img {
-    //     //   right: 20px;
-    //     }
-    //   }
-    //   a#glyph2 {
-    //     & > img {
-    //     //   right: 80px;
-    //     }
-    //   }
-    //   a#glyph3 {
-    //     & > img {
-    //     //   right: 140px;
-    //     }
-    //   }
-    //   a#glyph5 {
-    //     & > img {
-    //     //   right: 200px;
-    //     }
-    //   }
-    //   a#glyph4 {
-    //     & > img {
-    //     //   left: 20px;
-    //       display: none;
-    //     }
-    //   }
     &>div {
         &.leftSection {
             margin-left: 20px;
         }
-
         &>a {
-
             &#glyph5,
             &#glyph6 {
                 display: none;
                 opacity: 0;
                 transition: opacity 0.5s;
             }
-
             &>img {
                 width: 40px;
             }
         }
     }
 }
-
-.topnav>div.rightSection {
+nav>ul.rightSection {
+    list-style-type: none;
+    // list-style-type: disc; //li точка
+    // list-style-position: inside;
     // width: 250px;
     display: flex;
     flex-direction: row;
     align-items: center;
     // justify-content: space-around;
+    &>li {
+        // text-decoration: none;
+        &::before {
+            content: "\2022";
+            color: #00ace4;
+            // margin-left: 10px;
+            display: inline-block;
+            display: none;
+            // width: 20px;
+        }
+        &>a {
+            padding: 0 20px;
 
-    &>a {
-        padding: 0 20px;
+            &>img {
+                // margin: 0 20px;
 
-        &>img {
-            // margin: 0 20px;
-
-            //   width: 40px;
-            //   top: 15px;
-            //   position: fixed;
+                width: 40px;
+                //   top: 15px;
+                //   position: fixed;
+            }
         }
     }
 }
@@ -173,6 +150,7 @@ h4 {
 }
 
 .button {
+    font-family: 'Comfortaa';
     padding: 10px 30px;
     font-size: 20px;
     text-align: center;
@@ -250,7 +228,7 @@ h4 {
     font-size: 1.3rem;
     color: #999;
     //  font-weight: bold;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Comfortaa';
 }
 
 .scanStations>div {
@@ -299,6 +277,7 @@ h4 {
     display: flex;
     flex-direction: row;
     align-items: center;
+    font-family: 'Comfortaa';
 
     &>span {
         font-size: 1.5rem;
@@ -314,6 +293,8 @@ h4 {
         width: 80%;
         font-weight: bold;
         color: #333;
+        font-family: 'Comfortaa';
+
     }
 }
 
@@ -364,8 +345,9 @@ input[type="number"] {
 }
 
 #footer {
+    font-family: 'Comfortaa';
     width: 100%;
-    height: 45px;
+    height: 40px;
     background-color: rgb(20 54 66);
     position: fixed;
     bottom: 0px;
@@ -382,6 +364,7 @@ input[type="number"] {
         color: white;
         margin: 0;
         padding: 0;
+        font-family: 'Comfortaa';
 
         & a {
             color: white;
@@ -525,13 +508,14 @@ input[type="number"] {
     height: 80vh;
     width: 100%;
     padding: 0 20px;
+    overflow-y: auto;
 
     &>#termFrame {
         font-family: "MMD";
         font-size: 16px;
         color: white;
         min-height: 100%;
-        background-color: black;
+        // background-color: black;
         width: 100%;
         text-align: left;
     }

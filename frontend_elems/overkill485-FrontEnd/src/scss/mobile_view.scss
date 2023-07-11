@@ -1,20 +1,11 @@
 @include mobile {
-  .topnav {
+  nav {
     // background-color: rebeccapurple;
     height: 50px;
     & > h1 {
-      margin: 10px 0;
+      font-size: 1.8rem;
     }
     & >div{
-    //     &> a {
-
-    // //   & > img {
-    // //     top: 10px;
-    // //     width: 30px;
-    // //     // display: none;
-    // //   }
-    // }
-
        a#glyph5 {
          display: none;
 
@@ -32,15 +23,13 @@
 }
 
 @include xs-mobile {
-  .topnav {
-    // background-color: rebeccapurple;
+  nav {
     height: 50px;
     & > h1 {
-      margin: 10px 0;
+      font-size: 1.5rem;
     }
     & >div{
         &.rightSection{
-            // display: none;
             opacity: 0;
             transform: translateX(100%);
             transition: all 0.5s;
@@ -49,13 +38,10 @@
     a#glyph0{
         display: none;
     }
-    
       a#glyph5,a#glyph6 {
         display: block;
-        // opacity: 1;
         position: absolute;
         top:10px;
-        // animation: opacity 0.5s forwards;
         animation-play-state: paused;
       }
       a#glyph5{

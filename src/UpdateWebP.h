@@ -86,8 +86,7 @@ function ctxRender() {
 	ctx.textBaseline = "middle";
 	ctx.imageSmoothingQuality = "high";
     ctx.fillStyle = "#fff";
-    ctx.fillText(((performance.now()-now)/1000).toFixed(1),cnv.width/4,cnv.height/2);
-    // ctx.fillText((counter/1000).toFixed(3),cnv.width/2,cnv.height/2);
+    ctx.fillText(((performance.now()-now)/1000).toFixed(1),cnv.width/2,cnv.height/2);
     
     // counter+=(1000/60);
 } 

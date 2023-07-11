@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <title>Battery Status</title>
+
+<head>
+    <title>BMSESP</title>
 
     <meta charset="UTF-8" />
     <meta name="author" content=".p3xx" />
@@ -21,99 +22,100 @@
     <meta property="og:title" content="BMSESP" />
     <!-- <meta property="og:url" content="bmsesp.local"> -->
     <style>
-      body {
-        background-color: #333;
-      }
+        body {
+            background-color: #333;
+        }
     </style>
     <!-- <link rel="stylesheet" href="./scss/comfortaa-reg.css">
     <link rel="stylesheet" href="./scss/comfortaa-bold.css"> -->
     <!-- <link rel="stylesheet" href="./scss/comfortaa-300.css"> -->
     <!-- <link rel="stylesheet" href="./scss/comfortaa-500.css"> -->
-    <script type="module" crossorigin src="./someshit/index-bab4de88.js"></script>
-    <link rel="stylesheet" href="./someshit/index-ea8723d5.css">
-  </head>
-  <body>
-    <div class="topnav">
+  <script type="module" crossorigin src="./someshit/index-2e8eb172.js"></script>
+  <link rel="stylesheet" href="./someshit/index-497a3fdf.css">
+</head>
+
+<body>
+    <nav class="topnav">
         <div class="leftSection">
-      <a id="glyph0" href="/"> </a>
-      <a id="glyph5" href="#"> </a>
-      <a id="glyph6" href="#"> </a>
-      </div>
-      <!-- <input type="checkbox" id="glyph4" href="#"> </input>
+            <a id="glyph0" href="/"> </a>
+            <a id="glyph5" href="#"> </a>
+            <a id="glyph6" href="#"> </a>
+        </div>
+        <!-- <input type="checkbox" id="glyph4" href="#"> </input>
       <label for="glyph4"></label> -->
-      <h1>...</h1>
-      <div class="rightSection">
-        <a id="glyph4" href="/terminal"> </a>
-      <a id="glyph3" href="/update"> </a>
-      <a id="glyph2" href="/netscan"> </a>
-      <a id="glyph1" href="/settings"> </a>
-      </div>
+        <h1>...</h1>
+        <ul class="rightSection">
+            <li><a id="glyph4" href="/terminal"> </a></li>
+            <li><a id="glyph3" href="/update"> </a></li>
+            <li><a id="glyph2" href="/netscan"> </a></li>
+            <li><a id="glyph1" href="/settings"> </a></li>
+        </ul>
+     
 
-      <script>
-        const gl5 = document.querySelector("#glyph5");
-        const gl6 = document.querySelector("#glyph6");
-        const rs = document.querySelector('.rightSection');
+        <script>
+            const gl5 = document.querySelector("#glyph5");
+            const gl6 = document.querySelector("#glyph6");
+            const rs = document.querySelector('ul.rightSection');
 
-        gl5.onclick = (e)=>{
-            showSideBar();
-        }
-        gl6.onclick = (e)=>{
-            hideSideBar();
-        }
-        function showSideBar() {
-            console.log("showSideBar");
-            // 
-            gl5.style.animationName = "hide";
-            gl5.style.animationDuration = "500ms";
-            gl5.style.animationPlayState = "running";
-
-            gl6.style.display = "block";
-            gl6.style.animationName = "show";
-            gl6.style.animationDuration = "500ms";
-            gl6.style.animationPlayState = "running";
-            rs.style.transform="translateX(0)";
-            rs.style.opacity = 1;
-            gl5.onanimationend = () =>{
-                gl5.style.animationPlayState = "paused";
-                gl6.style.animationPlayState = "paused";
-                gl5.style.display = "none";
+            gl5.onclick = (e) => {
+                showSideBar();
             }
-
-        }
-        function hideSideBar() {
-            console.log("hideSideBar");
-
-            gl6.style.animationName = "hide";
-            gl6.style.animationDuration = "500ms";
-            gl6.style.animationPlayState = "running";
-
-            gl5.style.display = "block";
-            gl5.style.animationName = "show";
-            gl5.style.animationDuration = "500ms";
-            gl5.style.animationPlayState = "running";
-            rs.style.transform="translateX(100%)";
-            rs.style.opacity = 0;
-            gl5.onanimationend = () =>{
-                gl6.style.animationPlayState = "paused";
-                gl5.style.animationPlayState = "paused";
-                gl6.style.display = "none";
-                
+            gl6.onclick = (e) => {
+                hideSideBar();
             }
-        }
-      </script>
-    </div>
+            function showSideBar() {
+                console.log("showSideBar");
+                // 
+                gl5.style.animationName = "hide";
+                gl5.style.animationDuration = "500ms";
+                gl5.style.animationPlayState = "running";
+
+                gl6.style.display = "block";
+                gl6.style.animationName = "show";
+                gl6.style.animationDuration = "500ms";
+                gl6.style.animationPlayState = "running";
+                rs.style.transform = "translateX(0)";
+                rs.style.opacity = 1;
+                gl5.onanimationend = () => {
+                    gl5.style.animationPlayState = "paused";
+                    gl6.style.animationPlayState = "paused";
+                    gl5.style.display = "none";
+                }
+
+            }
+            function hideSideBar() {
+                console.log("hideSideBar");
+
+                gl6.style.animationName = "hide";
+                gl6.style.animationDuration = "500ms";
+                gl6.style.animationPlayState = "running";
+
+                gl5.style.display = "block";
+                gl5.style.animationName = "show";
+                gl5.style.animationDuration = "500ms";
+                gl5.style.animationPlayState = "running";
+                rs.style.transform = "translateX(100%)";
+                rs.style.opacity = 0;
+                gl5.onanimationend = () => {
+                    gl6.style.animationPlayState = "paused";
+                    gl5.style.animationPlayState = "paused";
+                    gl6.style.display = "none";
+
+                }
+            }
+        </script>
+    </nav>
     <div class="content">
-      <div id="card"></div>
+        <div id="card"></div>
     </div>
-    <div id="footer">
-      <span
-        >hostname:<span id="hostname"><a href="">%PUBLICIP%</a></span></span
-      >
-      <br />
-      <span>SSID:<span id="netName">%SSID%</span></span>
-      <span> IP:<span id="pubIP">%PUBLICIP%</span></span>
-      <span>AP IP : <span id="softIP">%LOCALIP%</span></span>
-    </div>
+    <footer id="footer">
+        <span>hostname:<span id="ftHostName"><a href="">%PUBLICIP%</a></span></span>
+        <br />
+        <span>SSID:<span id="ftNetName">%SSID%</span></span>
+        <span> IP:<span id="ftPubIP">%PUBLICIP%</span></span>
+        <span>AP IP : <span id="ftSoftIP">%LOCALIP%</span></span>
+    </footer>
     
-  </body>
+</body>
+
 </html>

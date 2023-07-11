@@ -35,7 +35,7 @@
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
 #endif
-
+#define CORS_DEBUG
 #include <NTPClient.h>
 #define USE_SERIAL_1602_LCD
 #define LCD_I2C_ADDRESS 0x27   // Default LCD address is 0x27 for a 20 chars and 4 line / 2004 display
@@ -44,10 +44,10 @@
 // #include <LCD_1602_RUS_ALL.h>
 LiquidCrystal_I2C myLCD(LCD_I2C_ADDRESS, 16, 2);
 
-byte rightUpAnode[8] = {0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11110, 0b11110, 0b11110};
-byte rightDownAnode[8] = {0b11110, 0b11110, 0b11110, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000};
-byte leftUpKathode[8] = {0b11111, 0b10000, 0b10111, 0b10111, 0b10111, 0b10111, 0b10111, 0b10111};
-byte leftDownKathode[8] = {0b10111, 0b10111, 0b10111, 0b10111, 0b10111, 0b10111, 0b10000, 0b11111};
+byte rightUpAnode[8] = {0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11100, 0b11100, 0b11100};
+byte rightDownAnode[8] = {0b11100, 0b11100, 0b11100, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000};
+byte leftUpKathode[8] = {0b00111, 0b00100, 0b00101, 0b00101, 0b00101, 0b00101, 0b00101, 0b00101};
+byte leftDownKathode[8] = {0b00101, 0b00101, 0b00101, 0b00101, 0b00101, 0b00101, 0b00100, 0b00111};
 
 byte upperFull[8] = {0b11111, 0b00000,0b11111,  0b11111, 0b11111, 0b11111, 0b11111, 0b11111};
 byte upperClear[8] = {0b11111, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000};
@@ -798,7 +798,7 @@ void setupWebServer()
             // ws.text(ip_cli_id, ipMsg);
 
 
-    response->print("</body></html>");
+    // response->print("</body></html>");
     //send the response last
     request->send(response); });
 
@@ -1031,6 +1031,10 @@ void setup()
     // server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);  //only when requested from AP
     //  server.rewrite("/", "/scan").setFilter(ON_AP_FILTER);
     //  server.rewrite("/", "/heap").setFilter(ON_STA_FILTER);
+    #ifdef CORS_DEBUG
+    DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
+    DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
+    #endif
     setupWebServer();
     initWebSocket();
     server.begin();

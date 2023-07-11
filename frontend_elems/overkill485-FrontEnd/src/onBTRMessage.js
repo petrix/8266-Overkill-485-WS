@@ -27,7 +27,7 @@ const onBTRMessage = (event) => {
         (
           Math.max.apply(null, batteryObj.cellsVoltage) -
           Math.min.apply(null, batteryObj.cellsVoltage)
-        ).toFixed(3) + " V";
+        ).toFixed(3) + " v";
 
       document.querySelector("#chrgMosfetValue").checked =
         batteryObj.chargeMosfet;

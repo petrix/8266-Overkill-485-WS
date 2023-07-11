@@ -13,18 +13,18 @@ onIPMessage.exec = (event) => {
       let value = obj.split(":-")[1];
       switch (item) {
         case "softap":
-          document.querySelector("#softIP").innerHTML = value;
+          document.querySelector("#ftSoftIP").innerHTML = value;
           break;
 
         case "local":
-          document.querySelector("#pubIP").innerHTML = value;
+          document.querySelector("#ftPubIP").innerHTML = value;
           break;
         case "ssid":
-          document.querySelector("#netName").innerHTML = value;
+          document.querySelector("#ftNetName").innerHTML = value;
           break;
         case "hostname":
           document.querySelector(
-            "#hostname"
+            "#ftHostName"
           ).innerHTML = `<a href="http://${value}.local">http://${value}.local</a>`;
           break;
 

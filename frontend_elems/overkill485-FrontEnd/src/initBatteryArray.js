@@ -31,7 +31,7 @@
         </svg>
       </div>
     </div>
-  <div class="percentage"><i class="icon" class="fas fa-plug"></i><span class="percentagexxx">0</span> V</div>
+  <div class="percentage"><span class="percentagexxx">0</span> v</div>
   </div>
   `
 

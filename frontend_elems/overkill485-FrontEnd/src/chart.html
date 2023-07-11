@@ -1,0 +1,369 @@
+<!DOCTYPE HTML>
+<html>
+<!-- Rui Santos - Complete project details at https://RandomNerdTutorials.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software. -->
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <style>
+        body{
+            background-color: #555;
+        }
+.highcharts-figure,
+.highcharts-data-table table {
+    min-width: 310px;
+    max-width: 800px;
+    margin: 1em auto;
+
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+    </style>
+</head>
+
+<body>
+    <h2>ESP Weather Station</h2>
+    <div id="chart-bms" class="container"></div>
+    <!-- <div id="chart-humidity" class="container"></div>
+    <div id="chart-pressure" class="container"></div> -->
+</body>
+<script>
+const drawChart = {};
+
+    var chartT = new Highcharts.Chart({
+        chart: { renderTo: 'chart-bms',
+        type: 'spline',
+        scrollablePlotArea: {
+            minWidth: 600,
+            scrollPositionX: 1
+        }
+     },
+        title: { text: 'BMS' },
+        series: [
+         {
+            name: "Cell1",
+            data: []
+        },
+         {
+            name: "Cell2",
+            data: []
+        },
+         {
+            name: "Cell3",
+            data: []
+        },
+         {
+            name: "Cell4",
+            data: []
+        }
+    ],
+    tooltip: {
+        valueSuffix: ' Volts'
+    },
+        plotOptions: {
+            spline: {
+            lineWidth: 4,
+            animation: true,
+                dataLabels: { enabled: true },
+            states: {
+                hover: {
+                    lineWidth: 5
+                }
+            },
+            marker: {
+                enabled: false
+            },
+            pointInterval: 3600000, // one hour
+            pointStart: Date.UTC(2022, 5, 13, 0, 0, 0)
+        },
+
+    
+            // line: {
+            //     animation: false,
+            //     dataLabels: { enabled: true }
+            // },
+            series: [{
+                color: '#059e8a',
+                label: {
+                    connectorAllowed: false
+                }
+            },{
+                color: '#fffe8a',
+                label: {
+                    connectorAllowed: false
+                }
+            }, {
+                color: '#ff9e8a',
+            }]
+        },
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: { second: '%H:%M:%S' }
+        },
+        yAxis: {
+            title: { text: 'Temperature (Celsius)' }
+            //title: { text: 'Temperature (Fahrenheit)' }
+        },
+        credits: { enabled: false }
+    });
+    // setInterval(function () {
+
+
+    //     fetch("http://cccp.local/btr").then(res => res.text()).then(txt => {
+    //         let payload = txt.split("BAT")[1];
+    //         payload = JSON.parse(payload);
+    //         payload = payload[0];
+    //         console.log(payload.currentTime);
+    //         let x = new Date(payload.currentTime * 1000).getTime();
+    //         let yc0 = payload.cellsVoltage[0];
+    //         let yc1 = payload.cellsVoltage[1];
+    //         let yc2 = payload.cellsVoltage[2];
+    //         let yc3 = payload.cellsVoltage[3];
+    //         // console.log(yc0);
+    //         // y1 = -y1;
+    //         // if (chartT.series[0].data.length > 40) {
+    //         //     chartT.series[0].addPoint([x, y], true, true, true);
+    //         //     chartT.series[1].addPoint([x, y1], true, true, true);
+    //         //     chartT.series[2].addPoint([x, yc0], true, true, true);
+
+    //         // } else {
+    //             // chartT.series[0].addPoint([x, y], true, false, true);
+    //             // chartT.series[1].addPoint([x, y1], true, false, true);
+    //             chartT.series[0].addPoint([x, yc0], true, false, true);
+    //             chartT.series[1].addPoint([x, yc1], true, false, true);
+    //             chartT.series[2].addPoint([x, yc2], true, false, true);
+    //             chartT.series[3].addPoint([x, yc3], true, false, true);
+
+    //         // }
+    //     })
+
+    //     //   var xhttp = new XMLHttpRequest();
+    //     //   xhttp.onreadystatechange = function() {
+    //     //     if (this.readyState == 4 && this.status == 200) {
+    //     //       var x = (new Date()).getTime(),
+    //     //           y = parseFloat(this.responseText);
+    //     //       //console.log(this.responseText);
+    //     //       if(chartT.series[0].data.length > 40) {
+    //     //         chartT.series[0].addPoint([x, y], true, true, true);
+    //     //       } else {
+    //     //         chartT.series[0].addPoint([x, y], true, false, true);
+    //     //       }
+    //     //     }
+    //     //   };
+    //     //   xhttp.open("GET", "http://cccp.local/btr", true);
+    //     //   xhttp.send();
+
+
+
+
+    // }, 3000);
+
+    // var chartH = new Highcharts.Chart({
+    //     chart: { renderTo: 'chart-humidity' },
+    //     title: { text: 'BME280 Humidity' },
+    //     series: [{
+    //         showInLegend: false,
+    //         data: []
+    //     }],
+    //     plotOptions: {
+    //         line: {
+    //             animation: false,
+    //             dataLabels: { enabled: true }
+    //         }
+    //     },
+    //     xAxis: {
+    //         type: 'datetime',
+    //         dateTimeLabelFormats: { second: '%H:%M:%S' }
+    //     },
+    //     yAxis: {
+    //         title: { text: 'Humidity (%)' }
+    //     },
+    //     credits: { enabled: false }
+    // });
+    // setInterval(function () {
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function () {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             var x = (new Date()).getTime(),
+    //                 y = parseFloat(this.responseText);
+    //             //console.log(this.responseText);
+    //             if (chartH.series[0].data.length > 40) {
+    //                 chartH.series[0].addPoint([x, y], true, true, true);
+    //             } else {
+    //                 chartH.series[0].addPoint([x, y], true, false, true);
+    //             }
+    //         }
+    //     };
+    //     xhttp.open("GET", "/humidity", true);
+    //     xhttp.send();
+    // }, 30000);
+
+    // var chartP = new Highcharts.Chart({
+    //     chart: { renderTo: 'chart-pressure' },
+    //     title: { text: 'BME280 Pressure' },
+    //     series: [{
+    //         showInLegend: false,
+    //         data: []
+    //     }],
+    //     plotOptions: {
+    //         line: {
+    //             animation: false,
+    //             dataLabels: { enabled: true }
+    //         },
+    //         series: { color: '#18009c' }
+    //     },
+    //     xAxis: {
+    //         type: 'datetime',
+    //         dateTimeLabelFormats: { second: '%H:%M:%S' }
+    //     },
+    //     yAxis: {
+    //         title: { text: 'Pressure (hPa)' }
+    //     },
+    //     credits: { enabled: false }
+    // });
+    // setInterval(function () {
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function () {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             var x = (new Date()).getTime(),
+    //                 y = parseFloat(this.responseText);
+    //             //console.log(this.responseText);
+    //             if (chartP.series[0].data.length > 40) {
+    //                 chartP.series[0].addPoint([x, y], true, true, true);
+    //             } else {
+    //                 chartP.series[0].addPoint([x, y], true, false, true);
+    //             }
+    //         }
+    //     };
+    //     xhttp.open("GET", "/pressure", true);
+    //     xhttp.send();
+    // }, 30000);
+
+    let wSock;
+// var gateway = "ws://" + "async-x.local" + "/ws";
+var gateway1 = "ws://" + "cccp.local" + "/ws";
+// var gateway1 = "ws://" + "10.1.1.1" + "/ws";
+// var gateway1 = "ws://" + window.location.hostname + "/ws";
+// var gateway1 = "ws://" + window.location.hostname + "/ws";
+// var gateway2 = "ws://" + "bmsesp2.local" + "/ws";
+async function socktRuner() {
+    return new Promise((resolve, reject) => {
+        wSock = new WebSocket(gateway1);
+        wSock.onopen = (e) => {
+            console.log("WS opened");
+            console.log(e);
+            document.websocket = wSock;
+            resolve(wSock);
+        };
+        wSock.onclose = (e) => {
+            console.log("WS closed");
+            console.log(e);
+            setTimeout(socktRuner, 2000);
+        };
+    });
+}
+let interVal;
+function runLoop() {
+    clearInterval(interVal)
+
+    interVal = setInterval(() => {
+        document.websocket.send("batteryStatus");
+    }, 1000);
+}
+
+socktRuner().then(e=>{
+    // document.websocket.send("batteryStatus");
+    runLoop()
+    console.log(e);
+    return e;
+}).then(e=>{
+    e.onmessage = (e)=>{
+        console.log(JSON.parse(e.data.split("BAT")[1])[0])
+        const dataObj = JSON.parse(e.data.split("BAT")[1])[0];
+        const x = new Date(dataObj.currentTime * 1000).getTime();
+        let yc0 = dataObj.cellsVoltage[0];
+            let yc1 = dataObj.cellsVoltage[1];
+            let yc2 = dataObj.cellsVoltage[2];
+            let yc3 = dataObj.cellsVoltage[3];
+            if(chartT.series[0].data.length < 40) {
+                chartT.series[0].addPoint([x, yc0], true, false, true);
+                chartT.series[1].addPoint([x, yc1], true, false, true);
+                chartT.series[2].addPoint([x, yc2], true, false, true);
+                chartT.series[3].addPoint([x, yc3], true, false, true);
+            }else{
+                chartT.series[0].addPoint([x, yc0], true, true, true);
+                chartT.series[1].addPoint([x, yc1], true, true, true);
+                chartT.series[2].addPoint([x, yc2], true, true, true);
+                chartT.series[3].addPoint([x, yc3], true, true, true);
+            }
+    }
+});
+
+
+
+
+
+
+/* 
+        fetch("http://cccp.local/btr").then(res => res.text()).then(txt => {
+            let payload = txt.split("BAT")[1];
+            payload = JSON.parse(payload);
+            payload = payload[0];
+            console.log(payload.currentTime);
+            let x = new Date(payload.currentTime * 1000).getTime();
+            let yc0 = payload.cellsVoltage[0];
+            let yc1 = payload.cellsVoltage[1];
+            let yc2 = payload.cellsVoltage[2];
+            let yc3 = payload.cellsVoltage[3];
+
+                chartT.series[0].addPoint([x, yc0], true, false, true);
+                chartT.series[1].addPoint([x, yc1], true, false, true);
+                chartT.series[2].addPoint([x, yc2], true, false, true);
+                chartT.series[3].addPoint([x, yc3], true, false, true);
+
+            // }
+        });
+ */
+</script>
+
+</html>
