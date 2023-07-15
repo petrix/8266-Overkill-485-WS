@@ -16,13 +16,37 @@ const onBTRMessage = (event) => {
         refreshLevel(i, x / 1.15, el);
         sum += el;
       });
+        
+        let cells = document.querySelectorAll(".cell");
+
+      batteryObj.cellsBalance.forEach((el, i) => {
+
+        // console.log(el, i);
+        // let xx = el - 3;
+        // el.querySelector('.battery').classList.add('balancing');
+        if(el){
+            cells[i].querySelector(".battery").classList.add("balancing")
+        }else{
+            cells[i].querySelector(".battery").classList.remove("balancing")
+        }
+      });
       console.log(sum.toFixed(3));
       const btrSt = document.btrSt;
-      btrSt.cellSum.value.innerHTML = sum.toFixed(3);
-      btrSt.balanceCap.value.innerHTML = batteryObj.BalanceCapacity + " Ah";
-      btrSt.rateCap.value.innerHTML = batteryObj.RateCapacity + " Ah";
-      btrSt.divVoltage.value.innerHTML = batteryObj.voltage + " Volts";
-      btrSt.divCurrent.value.innerHTML = batteryObj.current + " Ampers";
+      btrSt.cellSum.value.innerHTML = sum.toFixed(3)+ " v";
+      btrSt.balanceCap.value.innerHTML = batteryObj.BalanceCapacity + " ah";
+      btrSt.rateCap.value.innerHTML = batteryObj.RateCapacity + " ah";
+      btrSt.divVoltage.value.innerHTML = batteryObj.voltage + " v";
+      btrSt.divCurrent.value.innerHTML = batteryObj.current + " a";
+      if(batteryObj.current<0){
+        btrSt.divInputPower.value.innerHTML = "0 w";
+        btrSt.divOutputPower.value.innerHTML = (batteryObj.voltage * Math.abs(batteryObj.current)).toFixed(2)+ " w";
+      }else if(batteryObj.current>0){
+        btrSt.divInputPower.value.innerHTML = (batteryObj.voltage * batteryObj.current).toFixed(2) + " w";
+        btrSt.divOutputPower.value.innerHTML = "0 w";
+      }else{
+        btrSt.divInputPower.value.innerHTML = "0 w";
+        btrSt.divOutputPower.value.innerHTML = "0 w";
+      }
       btrSt.divVoltDiff.value.innerHTML =
         (
           Math.max.apply(null, batteryObj.cellsVoltage) -
@@ -35,7 +59,7 @@ const onBTRMessage = (event) => {
         batteryObj.dischargeMosfet;
       // document.querySelector("#chrgMosfetValue").onclick = e=>e.preventDefault;
 
-      btrSt.stateChrg.value.innerHTML = batteryObj.stateOfCharge;
+      btrSt.stateChrg.value.innerHTML = batteryObj.stateOfCharge + " %";
 
       document
         .querySelector("body > div.content > div > div.ntcsStats")

@@ -35,15 +35,29 @@
   </div>
   `
 
+        let half1 = document.createElement("div");
+        half1.setAttribute("aria-label","half1")
+        let half2 = document.createElement("div");
+        half2.setAttribute("aria-label","half2")
 
     for(let i = 0; i< elemNum; i++){
+
         let div1 = document.createElement("div");
+
+
         div1.setAttribute("id",`batteryCell${i}`);
         div1.classList.add("cell");
         div1.innerHTML = elem;
+        // if(i<elemNum/2){
+        // half1.appendChild(div1);
+        //     }else{
+        // half2.appendChild(div1);
+        //     }
         document.querySelector("#batteryArray").appendChild(div1);
-    }
 
+    }
+        // document.querySelector("#batteryArray").appendChild(half1);
+        // document.querySelector("#batteryArray").appendChild(half2);
     btrSt.cellSum = document.createElement("div");
     btrSt.cellSum.classList.add("cellSum");
     btrSt.appendChild(btrSt.cellSum);
@@ -67,7 +81,7 @@
     btrSt.divVoltage.appendChild(btrSt.divVoltage.value);
 
     btrSt.divVoltDiff = document.createElement("div");
-    btrSt.divVoltDiff.classList.add("voltage");
+    btrSt.divVoltDiff.classList.add("voltageDiff");
     btrSt.appendChild(btrSt.divVoltDiff);
     btrSt.divVoltDiff.name = document.createElement("span");
     btrSt.divVoltDiff.name.classList.add("divVoltDiffName");
@@ -87,6 +101,30 @@
     btrSt.divCurrent.value = document.createElement("span");
     btrSt.divCurrent.value.classList.add("currentValue");
     btrSt.divCurrent.appendChild(btrSt.divCurrent.value);
+
+    btrSt.divInputPower = document.createElement("div");
+    btrSt.divInputPower.classList.add("InputPower");
+    btrSt.appendChild(btrSt.divInputPower);
+    btrSt.divInputPower.name = document.createElement("span");
+    btrSt.divInputPower.name.classList.add("InputPowerName");
+    btrSt.divInputPower.name.innerHTML = "InputPower:"
+    btrSt.divInputPower.appendChild(btrSt.divInputPower.name);
+    btrSt.divInputPower.value = document.createElement("span");
+    btrSt.divInputPower.value.classList.add("InputPowerValue");
+    btrSt.divInputPower.appendChild(btrSt.divInputPower.value);
+
+    btrSt.divOutputPower = document.createElement("div");
+    btrSt.divOutputPower.classList.add("OutputPower");
+    btrSt.appendChild(btrSt.divOutputPower);
+    btrSt.divOutputPower.name = document.createElement("span");
+    btrSt.divOutputPower.name.classList.add("OutputPowerName");
+    btrSt.divOutputPower.name.innerHTML = "OutputPower:"
+    btrSt.divOutputPower.appendChild(btrSt.divOutputPower.name);
+    btrSt.divOutputPower.value = document.createElement("span");
+    btrSt.divOutputPower.value.classList.add("OutputPowerValue");
+    btrSt.divOutputPower.appendChild(btrSt.divOutputPower.value);
+
+
 
     btrSt.balanceCap = document.createElement("div");
     btrSt.balanceCap.classList.add("balanceCap");
